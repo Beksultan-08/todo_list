@@ -1,21 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Users</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Мой Блог{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-<h1>All Users</h1>
-{% for user in users %}
-<p>ID: {{ user.id }}</p>
-<p>Email: {{ user.email }}</p>
-<p>First Name: {{ user.first_name }}</p>
-<p>Last Name: {{ user.last_name }}</p>
-<p>Age: {{ user.age }}</p>
-<p>Is Staff:{{ user.is_staff }}</p>
-<p>Is Superuser:{{ user.is_superuser }}</p>
-<p>Is Active: {{ user.is_active }}</p>
-<hr>
-{% endfor %}
+    <header>
+        <nav>
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'home' %}">Главная</a></li>
+                    <li><a href="{% url 'blog:category-list' %}">Категории</a></li>
+                    <li><a href="{% url 'blog:post-create' %}">Создать пост</a></li>
+                    <li><a href="{% url 'account:profile' %}">Профиль</a></li>
+                    <li><a href="{% url 'account:logout' %}">Выйти</a></li>
+                {% else %}
+                    <li><a href="{% url 'account:login' %}">Войти</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2023 Мой Блог. Все права защищены.</p>
+    </footer>
 </body>
 </html>

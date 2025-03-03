@@ -57,7 +57,7 @@ def register(request):
         form = RegistrationForm()
     return render(
         request,
-        'account/registration/register.html', {'form': form}
+        'account/registration/registration.html', {'form': form}
     )
 
 
@@ -75,7 +75,7 @@ def activate(request, uidb64, token):
         return redirect('account:login')
     else:
         messages.error(request, 'Activation link is invalid!')
-        return redirect('account:register')
+        return redirect('account:registration')
 
 
 def user_logout(request):
