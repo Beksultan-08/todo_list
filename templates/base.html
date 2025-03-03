@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<h1>All Users</h1>
+{% for user in users %}
+<p>ID: {{ user.id }}</p>
+<p>Email: {{ user.email }}</p>
+<p>First Name: {{ user.first_name }}</p>
+<p>Last Name: {{ user.last_name }}</p>
+<p>Age: {{ user.age }}</p>
+<p>Is Staff:{{ user.is_staff }}</p>
+<p>Is Superuser:{{ user.is_superuser }}</p>
+<p>Is Active: {{ user.is_active }}</p>
+<hr>
+{% endfor %}
+</body>
+</html>
