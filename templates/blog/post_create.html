@@ -3,12 +3,15 @@
 {% block title %} Создать статью {% endblock title %}
 
 {% block content %}
-    <div class="create-post-container">
-        <h1>Создать статью</h1>
-        <form method="post" action="{% url 'blog:post-create' %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="submit-btn">Опубликовать</button>
-        </form>
-    </div>
+<div class="create-post-container">
+    <h1>Создать статью</h1>
+    <form method="post" action="{% url 'blog:post-create' %}" enctype="multipart/form-data">
+        <label for="due_date">Срок выполнения:</label>
+        <input type="date" name="due_date" id="due_date" value="{{ form.due_date.value|default_if_none:'' }}">
+
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">Опубликовать</button>
+    </form>
+</div>
 {% endblock content %}

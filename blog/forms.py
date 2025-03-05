@@ -8,9 +8,13 @@ class CreatePostForm(forms.ModelForm):
         queryset=Category.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=True,
-        label='Категории',
-        help_text='Выберите одну или несколько категорий'
+        label='Приоритет задачи',
+        help_text='Выберите одну или несколько приоритет задач '
+
     )
+    due_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Post

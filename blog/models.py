@@ -9,11 +9,11 @@ class Category(models.Model):
     name = models.CharField(
         max_length=255,
         unique=True,
-        verbose_name="Категория"
+        verbose_name="Приоритет задачи "
     )
 
     class Meta:
-        verbose_name = "Категория"
+        verbose_name = "Приоритет задачи "
         verbose_name_plural = "Категории"
 
     def __str__(self):
@@ -24,7 +24,7 @@ class Post(models.Model):
     category = models.ManyToManyField(
         to=Category,
         related_name="posts",
-        verbose_name="Категории",
+        verbose_name="Приоритет задачи",
     )
     owner = models.ForeignKey(
         to=User,
@@ -36,7 +36,8 @@ class Post(models.Model):
         max_length=255,
         verbose_name="Заголовок",
     )
-    description = models.CharField(
+    description = models.TextField(
+        blank=True, null=True,
         max_length=255,
         verbose_name="Описание"
     )
@@ -67,6 +68,7 @@ class Post(models.Model):
         blank=True,
         verbose_name="Не нравится"
     )
+    due_date = models.DateField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")

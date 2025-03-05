@@ -41,7 +41,6 @@ INSTALLED_APPS = [
 
     'account.apps.AccountConfig',
     'blog.apps.BlogConfig',
-    'task.apps.TaskConfig',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +55,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 AUTH_USER_MODEL = 'account.User'
-AUTH_USER_MODEL = 'task.User'
+
 
 
 

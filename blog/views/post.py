@@ -16,16 +16,11 @@ def post_list(request):
 @login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post_categories = post.category.all()
-    comments = post.comments.all()
     context = {
-        'user': request.user,
         'post': post,
-        'comments': comments,
-        'post_categories': post_categories
+        'due_date': post.due_date
     }
     return render(request, 'blog/post_detail.html', context)
-
 
 @login_required
 def post_create(request):
@@ -34,6 +29,8 @@ def post_create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.owner = request.user
+            if not post.due_date:  # Если срок не указан, можно установить значение по умолчанию
+                post.due_date = None
             post.save()
             form.save_m2m()
             return redirect('home')
@@ -52,11 +49,7 @@ def post_edit(request, pk):
             return redirect('blog:post-detail', pk=pk)
     else:
         form = CreatePostForm(instance=post)
-    context = {
-        'post': post,
-        'form': form
-    }
-    return render(request, 'blog/post_edit.html', context)
+    return render(request, 'blog/post_edit.html', {'form': form, 'post': post})
 
 
 @login_required

@@ -1,12 +1,10 @@
 from django.urls import path
-from blog.views import category,post
+from blog.views import post, category
 
 app_name = 'blog'
 
 urlpatterns = [
-    # категории
-    path('categories/', category.category_list, name='category-list'),
-    path('categories/<int:pk>/', category.category_detail, name='category-detail'),
+path('categories/<int:pk>/', category.category_detail, name='category-detail'),
     # Посты
     path('posts/', post.post_list, name='post-list'),
     path('posts/<int:pk>/', post.post_detail, name='post-detail'),
