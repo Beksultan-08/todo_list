@@ -1,0 +1,20 @@
+<form method="get" action="{% url 'sorted_task_list' %}">
+    <select name="sort_by">
+        <option value="created_at">By Date</option>
+        <option value="is_completed">By Status</option>
+        <option value="priority">By Priority</option>
+        <option value="deadline">By Deadline</option>
+    </select>
+    <button type="submit">Sort</button>
+</form>
+
+<ul>
+    {% for task in tasks %}
+        <li>
+            {{ task.title }} - {{ task.is_completed }} - {{ task.deadline }}
+            <a href="{% url 'edit_task' task.id %}">Edit</a>
+            <a href="{% url 'delete_task' task.id %}">Delete</a>
+            <a href="{% url 'toggle_task_status' task.id %}">Toggle Status</a>
+        </li>
+    {% endfor %}
+</ul>
