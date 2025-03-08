@@ -13,6 +13,7 @@ class TaskForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
         }
 
+
 # 👤 Форма для регистрации
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)

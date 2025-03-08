@@ -9,9 +9,10 @@ class Task(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('pending', 'Ожидание'),
+        ('To do', 'ожидание'),
         ('in_progress', 'В процессе'),
-        ('completed', 'Выполнено'),
+        ('In review', 'На рассмотрении'),
+        ('Done', 'Выполнено'),
     ]
 
     title = models.CharField(max_length=200)
@@ -25,3 +26,4 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+

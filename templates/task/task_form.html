@@ -1,0 +1,14 @@
+{% block content %}
+  <div class="container mt-4">
+    <h2>{% if task %}Редактировать задачу{% else %}Добавить задачу{% endif %}</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        {{ form.as_p }}
+      </div>
+      <button type="submit" class="btn btn-primary">{% if task %}Сохранить{% else %}Добавить{% endif %}</button>
+      <a href="{% url 'task_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+  </div>
+{% endblock %}
