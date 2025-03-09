@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     username = None
     date_joined = None
     email = models.EmailField(

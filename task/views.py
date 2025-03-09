@@ -1,61 +1,53 @@
-from django import forms
-from django.shortcuts import render, get_object_or_404, redirect
-from task.models import Task
-from task.forms import TaskForm
-from django.views.generic import ListView
+from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 from .models import Task
 
-
-class TaskListView(ListView):
-    model = Task
-    template_name = 'task_list.html'
-    context_object_name = 'task'
-
-
+@login_required
 def task_list(request):
-    tasks = Task.objects.all()
-    return render(request, 'task/task_list.html', {'task': tasks})
+    tasks = Task.objects.filter(user=request.user)
+    return render(request, 'task/task_list.html', {'tasks': tasks})
 
+from django.shortcuts import render, redirect
+from .forms import TaskForm
 
-def add_task(request):
+@login_required
+def task_create(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
-            form.save()
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
             return redirect('task_list')
     else:
         form = TaskForm()
     return render(request, 'task/task_form.html', {'form': form})
 
 
+def task_detail(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    return render(request, 'task/task_detail.html', {'task': task})
 
-def edit_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
+from django.shortcuts import get_object_or_404
+
+@login_required
+def task_update(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
     if request.method == 'POST':
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect('task/task_list')
+            return redirect('task_list')
     else:
         form = TaskForm(instance=task)
-        return redirect('task/task_list', {'form':form})
+    return render(request, 'task/task_form.html', {'form': form})
 
-
-def delete_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-    task.delete()
-    return redirect('task/task_list')
-
-
-def toggle_task_status(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-    task.is_completed = not task.is_completed
-    task.save()
-    return redirect('task/task_list')
-
-
-def sorted_task_list(request):
-    sort_by = request.GET.get('sort_by', 'created_at')  # Параметр сортировки
-    tasks = Task.objects.all().order_by(sort_by)
-    return render(request, 'task/task_list.html', {'task': tasks})
+@login_required
+def task_delete(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    if request.method == 'POST':
+        task.delete()
+        return redirect('task_list')
+    return render(request, 'task/task_confirm_delete.html', {'task': task})
 

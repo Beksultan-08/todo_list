@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from account.forms import ProfileForm
-from account.models import User
+from account.models import CustomUser
 
 
 @login_required

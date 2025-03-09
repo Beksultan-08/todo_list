@@ -9,7 +9,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.conf import settings
 
 from account.forms import RegistrationForm, LoginForm
-from account.models import User
+from account.models import CustomUser
 
 
 def user_login(request):
@@ -61,8 +61,8 @@ def register(request):
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
         user = None
 
     if user and default_token_generator.check_token(user, token):

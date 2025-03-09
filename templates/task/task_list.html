@@ -1,56 +1,137 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список задач</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-4">
-        <h1 class="mb-4">Список задач</h1>
-        <a href="{% url 'task:add_task' %}" class="btn btn-primary mb-3">Добавить задачу</a>
+{% extends 'base.html' %}
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Приоритет</th>
-                    <th>Дедлайн</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in tasks %}
-                <tr>
-                    <td>{{ task.title }}</td>
-                    <td>
-                        {% if task.priority == 'low' %}
-                            <span class="text-success">Низкий</span>
-                        {% elif task.priority == 'medium' %}
-                            <span class="text-warning">Средний</span>
-                        {% else %}
-                            <span class="text-danger">Высокий</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ task.deadline }}</td>
-                    <td>
-                        <span class="badge bg-{% if task.status == 'To Do' %}secondary{% elif task.status == 'In Progress' %}primary{% elif task.status == 'In Review' %}warning{% else %}success{% endif %}">
-                            {{ task.status }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'task:edit_task' task.id %}" class="btn btn-sm btn-warning">Редактировать</a>
-                        <a href="/tasks/{{ task.id }}/delete/" class="btn btn-sm btn-danger">Удалить</a>
-                        <a href="/tasks/{{ task.id }}/change_status/" class="btn btn-sm btn-info">Изменить статус</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{% block content %}
+<h1>Список задач</h1>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+<form id="filter-form">
+    <select name="status" id="status-filter">
+        <option value="">Все статусы</option>
+        <option value="todo">To Do</option>
+        <option value="in_progress">In Progress</option>
+        <option value="in_review">In Review</option>
+        <option value="done">Done</option>
+    </select>
+
+    <select name="priority" id="priority-filter">
+        <option value="">Все приоритеты</option>
+        <option value="low">Низкий</option>
+        <option value="medium">Средний</option>
+        <option value="high">Высокий</option>
+    </select>
+
+    <select name="deadline" id="deadline-filter">
+        <option value="">Все дедлайны</option>
+        <option value="today">На сегодня</option>
+        <option value="week">На неделю</option>
+        <option value="overdue">Просроченные</option>
+    </select>
+
+    <button type="button" id="apply-filter">Фильтр</button>
+</form>
+
+
+<form id="sort-form">
+    <select name="sort" id="sort-select">
+        <option value="-created_at">Новые</option>
+        <option value="created_at">Старые</option>
+        <option value="priority">Приоритет (Низкий → Высокий)</option>
+        <option value="-priority">Приоритет (Высокий → Низкий)</option>
+        <option value="deadline">Дедлайн (Ближайшие)</option>
+        <option value="-deadline">Дедлайн (Отдалённые)</option>
+    </select>
+    <button type="button" id="apply-sort">Сортировка</button>
+</form>
+
+<ul class="task-list" id="task-list">
+    {% for task in tasks %}
+        <li class="task-item" data-status="{{ task.status }}" data-priority="{{ task.priority }}" data-deadline="{{ task.deadline|date:'Y-m-d H:i' }}" data-created-at="{{ task.created_at|date:'Y-m-d H:i' }}">
+            <div class="task-info">
+                <h2>{{ task.title }}</h2>
+                <p>{{ task.description }}</p>
+                <p>Приоритет: <span class="priority-{{ task.priority }}">{{ task.get_priority_display }}</span></p>
+                 <p>Дата создания: {{ task.created_at }}</p>
+                <p>Дедлайн: {{ task.deadline|date:"d M Y H:i" }}</p>
+                <p>Статус: <span class="status-{{ task.status }}">{{ task.get_status_display }}</span></p>
+            </div>
+            <div class="task-actions">
+                <a href="{% url 'task_update' task.pk %}" class="btn btn-primary">Редактировать</a>
+                <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger">Удалить</a>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'task_create' %}" class="btn btn-success">Добавить задачу</a>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const taskList = document.getElementById('task-list');
+        const tasks = Array.from(taskList.children);
+
+        function filterTasks() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const priorityFilter = document.getElementById('priority-filter').value;
+            const deadlineFilter = document.getElementById('deadline-filter').value;
+            const now = new Date();
+
+            tasks.forEach(task => {
+                const taskStatus = task.getAttribute('data-status');
+                const taskPriority = task.getAttribute('data-priority');
+                const taskDeadline = new Date(task.getAttribute('data-deadline'));
+
+                let statusMatch = !statusFilter || taskStatus === statusFilter;
+                let priorityMatch = !priorityFilter || taskPriority === priorityFilter;
+                let deadlineMatch = true;
+
+                if (deadlineFilter === 'today') {
+                    deadlineMatch = taskDeadline.toDateString() === now.toDateString();
+                } else if (deadlineFilter === 'week') {
+                    const weekEnd = new Date(now);
+                    weekEnd.setDate(now.getDate() + 7);
+                    deadlineMatch = taskDeadline >= now && taskDeadline <= weekEnd;
+                } else if (deadlineFilter === 'overdue') {
+                    deadlineMatch = taskDeadline < now;
+                }
+
+                if (statusMatch && priorityMatch && deadlineMatch) {
+                    task.style.display = '';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        }
+
+
+        function sortTasks() {
+            const sortSelect = document.getElementById('sort-select').value;
+            const sortedTasks = tasks.slice().sort((a, b) => {
+                if (sortSelect === '-created_at') {
+                    return new Date(b.getAttribute('data-created-at')) - new Date(a.getAttribute('data-created-at'));
+                } else if (sortSelect === 'created_at') {
+                    return new Date(a.getAttribute('data-created-at')) - new Date(b.getAttribute('data-created-at'));
+                } else if (sortSelect === 'priority') {
+                    return a.getAttribute('data-priority').localeCompare(b.getAttribute('data-priority'));
+                } else if (sortSelect === '-priority') {
+                    return b.getAttribute('data-priority').localeCompare(a.getAttribute('data-priority'));
+                } else if (sortSelect === 'deadline') {
+                    return new Date(a.getAttribute('data-deadline')) - new Date(b.getAttribute('data-deadline'));
+                } else if (sortSelect === '-deadline') {
+                    return new Date(b.getAttribute('data-deadline')) - new Date(a.getAttribute('data-deadline'));
+                }
+                return 0;
+            });
+
+            taskList.innerHTML = '';
+            sortedTasks.forEach(task => taskList.appendChild(task));
+        }
+
+
+        document.getElementById('apply-filter').addEventListener('click', filterTasks);
+
+
+        document.getElementById('apply-sort').addEventListener('click', sortTasks);
+    });
+</script>
+{% endblock %}

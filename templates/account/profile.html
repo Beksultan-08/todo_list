@@ -13,51 +13,19 @@
             <a href="{% url 'account:profile-edit' %}" class="profile-btn">Редактировать профиль</a>
         </div>
 
-        <div class="profile-posts">
-            <h2>Мои статьи</h2>
-            {% if user.posts.all %}
+        <div class="profile-tasks">
+            <h2>Мои задачи</h2>
+            {% if user.task_set.all %}
                 <ul>
-                    {% for post in user.posts.all %}
+                    {% for task in user.task_set.all %}
                         <li>
-                            <a href="{% url 'blog:post-detail' post.id %}">{{ post.title }}</a>
-                            <span class="post-date">{{ post.created_at|date:"d M Y" }}</span>
+                            <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a>
+                            <span class="task-date">{{ task.created_at|date:"d M Y" }}</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>У вас пока нет статей.</p>
-            {% endif %}
-        </div>
-
-        <div class="profile-bookmarks">
-            <h2>Закладки</h2>
-            {% if user.bookmarks.all %}
-                <ul>
-                    {% for post in user.bookmarks.all %}
-                        <li>
-                            <a href="{% url 'blog:post-detail' post.id %}">{{ post.title }}</a>
-                            <span class="post-date">{{ post.created_at|date:"d M Y" }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>У вас пока нет закладок.</p>
-            {% endif %}
-        </div>
-
-        <div class="profile-likes">
-            <h2>Понравившиеся статьи</h2>
-            {% if user.likes.all %}
-                <ul>
-                    {% for post in user.likes.all %}
-                        <li>
-                            <a href="{% url 'blog:post-detail' post.id %}">{{ post.title }}</a>
-                            <span class="post-date">{{ post.created_at|date:"d M Y" }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>У вас пока нет понравившихся статей.</p>
+                <p>У вас пока нет задач. <a href="{% url 'task_create' %}">Создайте свою первую задачу!</a></p>
             {% endif %}
         </div>
     </div>

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import PasswordChangeForm
-from account.models import User
+from account.models import CustomUser
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):
@@ -41,12 +41,12 @@ class RegistrationForm(UserCreationForm):
     )
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'password1', 'password2')
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already exists')
         return email
 
@@ -73,5 +73,5 @@ class LoginForm(forms.Form):
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ('first_name', 'last_name', 'age')
